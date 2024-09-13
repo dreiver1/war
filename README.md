@@ -15,3 +15,10 @@ Este repositório contém o backend para o jogo de tabuleiro War, desenvolvido u
    Navegue até o diretório `src` e execute o seguinte comando para instalar as dependências listadas no `requirements.txt`:
    ```bash
    pip install -r requirements.txt
+
+1. **Inicie o Servidor local**:
+   Execute o Servidor com o comando:
+   ```bash
+   uvicorn main:app --reload
+
+   - cetifique-se de estar dentro do diretorio `/src`
