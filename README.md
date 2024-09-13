@@ -6,6 +6,7 @@ Este repositório contém o backend para o jogo de tabuleiro War, desenvolvido u
 
 - `src/`: Contém o código-fonte do projeto e o banco de dados SQLite.
   - `war_game.db`: Banco de dados SQLite com dados já cadastrados.
+    - para inciar o servidor sem dados de player apague o arquivo e reinicie o servidor.
   - `main.py`: Arquivo principal para iniciar o servidor FastAPI.
   - `requirements.txt`: Lista de dependências necessárias para o projeto.
 
