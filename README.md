@@ -21,4 +21,4 @@ Este repositório contém o backend para o jogo de tabuleiro War, desenvolvido u
    ```bash
    uvicorn main:app --reload
 
-   - cetifique-se de estar dentro do diretorio `/src`
+- cetifique-se de estar dentro do diretorio `/src`
