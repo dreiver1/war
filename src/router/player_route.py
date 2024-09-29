@@ -1,53 +1,27 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from db_config import SessionLocal
-from models import Player, Objective
+from src.db_config import get_db
+from src.router.facade.player_facade import PlayerController
 
 router = APIRouter()
+controller = PlayerController()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+class PlayerCreate(BaseModel):
+    name: str
+    color: str
 
-
-@router.get("/players/", response_model=dict)
+@router.get("/", response_model=dict)
 def get_player(db: Session = Depends(get_db)):
-    players = db.query(Player).all()
-    if not players:
-        raise HTTPException(status_code=404, detail="Nenhum jogador encontrado.")
-    return {"players": players}
+    return controller.get_player(db)
 
+@router.post("/", response_model=dict)
+def create_player(player: PlayerCreate, db: Session = Depends(get_db)):
+    return controller.create_player(player.name, player.color, db)
 
-@router.post("/players/", response_model=dict)
-def create_player(name: str, color: str, db: Session = Depends(get_db)):
-    if db.query(Player).filter(Player.color == color).first():
-        raise HTTPException(status_code=400, detail="A cor já foi escolhida por outro jogador.")
-    
-    player = Player(name=name, color=color)
-    db.add(player)
-    db.commit()
-    db.refresh(player)
-    
-    return {"id": player.id, "name": player.name, "color": player.color}
-
-@router.post("/objectives/{player_id}", response_model=dict)
-def assign_objective(player_id: int, db: Session = Depends(get_db)):
-    player = db.query(Player).filter(Player.id == player_id).first()
-    if not player:
-        raise HTTPException(status_code=404, detail="Jogador não encontrado.")
-    
-    while True:
-        objective = db.query(Objective).filter(Objective.assigned == False).first()
-        if not objective:
-            raise HTTPException(status_code=404, detail="Não há objetivos disponíveis.")
-        
-        if not objective.player_id:
-            objective.player_id = player_id
-            objective.assigned = True
-            db.commit()
-            db.refresh(objective)
-            return {"player_id": player_id, "objective": objective.description}
-
+@router.post("/attack", response_model=dict)
+def attack(attacker_id: int, attacker_territory_id: str, defender_territory_id: str, db: Session = Depends(get_db)):
+    return controller.attack_territory(db, attacker_id, attacker_territory_id, defender_territory_id)
+@router.get('/new_round')
+def new_round(db: Session = Depends(get_db)):
+    return controller.new_round(db)
